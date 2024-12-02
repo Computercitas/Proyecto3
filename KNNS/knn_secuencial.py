@@ -5,10 +5,11 @@ import requests
 from io import BytesIO
 from PIL import Image
 import heapq
+from time import perf_counter
 
 # Función para cargar descriptores y mapeo desde archivos
 def load_features(output_dir):
-    descriptors = np.load(f"{output_dir}/descriptores_pca44.npy")
+    descriptors = np.load(f"{output_dir}/descriptores.npy")
     with open(f"{output_dir}/checkpoint.json", 'r') as f:
         mapping = json.load(f)
     return descriptors, mapping
@@ -19,6 +20,7 @@ def euclidean_distance(P, Q):
 
 # Función de búsqueda K-NN secuencial
 def knn_sequential(query_vector, descriptors, k=5):
+    start_time = perf_counter()
     distances = []
     # Calcular la distancia de cada descriptor al query_vector
     for i, descriptor in enumerate(descriptors):
@@ -28,6 +30,9 @@ def knn_sequential(query_vector, descriptors, k=5):
     # Ordenar por distancia y seleccionar los k más cercanos
     distances.sort(key=lambda x: x[0])
     nearest_neighbors = distances[:k]
+    end_time = perf_counter()
+    time = (end_time - start_time)*1000
+    print(f"K-NN secuencial tomó {time:.4f} ms.")
     return nearest_neighbors
 
 # Función para obtener el nombre y link de la imagen por índice
@@ -235,10 +240,10 @@ def show_results2(indices, output_dir, query_idx=None, num_results=5):
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
 
-output_dir = "./Extraccion/features15k"
+output_dir = "features15k"
 descriptors, mapping = load_features(output_dir)
 # Selección de una consulta aleatoria del dataset
-random_idx = select_random_query(descriptors)
+random_idx = np.random.randint(0, len(descriptors))
 print(f"Índice de consulta aleatoria: {random_idx}")
 query_vector = descriptors[random_idx]
 
@@ -252,6 +257,6 @@ knn_range = range_search(descriptors,query_vector,25)
 
 
 # Mostrar los resultados 
-#show_results(knn_result, output_dir, random_idx, k)
+show_results(knn_result, output_dir, random_idx, k)
 #show_results2(knn_pq,output_dir,random_idx,k)
-show_results2(knn_range,output_dir,random_idx,k)
+#show_results2(knn_range,output_dir,random_idx,k)
