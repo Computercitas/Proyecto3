@@ -240,7 +240,7 @@ def show_results2(indices, output_dir, query_idx=None, num_results=5):
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
 
-output_dir = "features15k"
+output_dir = "./Extraccion/features15k"
 descriptors, mapping = load_features(output_dir)
 # Selección de una consulta aleatoria del dataset
 random_idx = np.random.randint(0, len(descriptors))
