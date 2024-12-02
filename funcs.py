@@ -14,7 +14,7 @@ def load_features(output_dir):
 
 
 # Métrica de distancia: Euclidiana
-def euclidean_distance(P, Q):
+def euclidean_distance(P, Q): 
     return np.sqrt(np.sum((P - Q) ** 2))
 
 def show_results(results, output_dir, query_idx=None, num_results=5):
