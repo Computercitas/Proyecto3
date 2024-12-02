@@ -53,6 +53,20 @@ Para nuestro análisis, se decidió reducir los descriptores a 44 componentes, l
 - **Búsqueda KNN (K-Nearest Neighbors):** Se implementarán algoritmos para encontrar los K objetos más similares a una consulta dada utilizando una cola de prioridad.
 - **Búsqueda por Rango:** Recuperará objetos dentro de un radio específico de la consulta. Se experimentará con tres valores de radio diferentes analizando la distribución de las distancias.
 
+### KNN-HighD
+El KNN-HighD es un enfoque diseñado para realizar búsquedas eficientes de los k vecinos más cercanos en espacios vectoriales de alta dimensionalidad. Este método utiliza la biblioteca FAISS (Facebook AI Similarity Search) para mitigar el impacto de la "maldición de la dimensionalidad", un fenómeno en el que el rendimiento de las búsquedas basadas en la distancia disminuye significativamente a medida que aumenta la dimensionalidad de los datos.
+
+Mitigación de la Maldición de la Dimensionalidad
+FAISS utiliza optimizaciones específicas para manejar colecciones en espacios de alta dimensionalidad:
+
+- Particionamiento (IndexIVFFlat): Reduce los cálculos innecesarios al restringir la búsqueda a clústeres relevantes.
+- Optimización Hardware: Aprovecha arquitecturas modernas (CPU/GPU) para mejorar el rendimiento.
+
+Beneficios del KNN-HighD con FAISS
+- Velocidad: Reducción significativa en tiempos de búsqueda frente a métodos tradicionales.
+- Escalabilidad: Manejo eficiente de grandes volúmenes de datos sin comprometer la precisión.
+- Flexibilidad: El índice puede ser almacenado en disco, facilitando su reutilización y reduciendo el consumo de memoria.
+
 ---
 
 ## 3. Frontend
