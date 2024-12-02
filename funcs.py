@@ -95,3 +95,46 @@ def show_results(results, output_dir, query_idx=None, num_results=5):
 #Seleccionar imagen aleatoria de los descriptores
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
+
+
+from skimage.io import imread
+from skimage.color import rgb2gray
+import numpy as np
+import joblib
+import cv2
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+def preprocess_query(query_path):
+    scaler_path = "./Extraccion/features15k/scaler_model.joblib"
+    pca_path = "./Extraccion/features15k/pca_model.joblib"
+    
+    try:
+        img = imread(query_path)
+        if len(img.shape) == 3:
+            img = rgb2gray(img)  # Convert to grayscale if image has 3 channels
+        
+        img = (img * 255).astype(np.uint8)  # Ensure image pixel range is [0, 255]
+        
+        sift = cv2.SIFT_create()
+        keypoints, descriptors = sift.detectAndCompute(img, None) #Extraer features con SIFT
+
+        if descriptors is None:
+            return None
+        
+        descriptor = np.mean(descriptors, axis=0)
+
+        scaler = joblib.load(scaler_path)
+        pca = joblib.load(pca_path)
+
+        if descriptor.ndim == 1:
+            descriptor = descriptor.reshape(1, -1)
+
+        descriptor_scaled = scaler.transform(descriptor) # Escalar vector
+        descriptor_reduced = pca.transform(descriptor_scaled) # Aplicar PCA
+        query_vector = descriptor_reduced.reshape(-1)
+        return query_vector
+
+    except Exception as e:
+        print(f"Error in preprocess_query: {e}")
+        return None
