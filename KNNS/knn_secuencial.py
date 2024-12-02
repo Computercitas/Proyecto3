@@ -235,10 +235,10 @@ def show_results2(indices, output_dir, query_idx=None, num_results=5):
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
 
-output_dir = "features15k"
+output_dir = "./Extraccion/features15k"
 descriptors, mapping = load_features(output_dir)
 # Selección de una consulta aleatoria del dataset
-random_idx = np.random.randint(0, len(descriptors))
+random_idx = select_random_query(descriptors)
 print(f"Índice de consulta aleatoria: {random_idx}")
 query_vector = descriptors[random_idx]
 
@@ -248,7 +248,7 @@ k = 8
 # Búsqueda de K-NN secuencial
 knn_result = knn_sequential(query_vector, descriptors, k+1)
 knn_pq = knn_priority_queue(descriptors,query_vector,k)
-knn_range = range_search(descriptors,query_vector,r=25)
+knn_range = range_search(descriptors,query_vector,25)
 
 
 # Mostrar los resultados 
