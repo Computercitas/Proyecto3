@@ -3,6 +3,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from skimage.io import imread
+import time  # Importar módulo para medir tiempo
 
 #para importar funcs.py
 import sys
@@ -12,7 +13,7 @@ base_dir = os.path.abspath(os.path.join(script_dir, '..'))
 sys.path.append(base_dir)
 import funcs
 
-output_dir = "./Extraccion/features15k"
+output_dir = "../Extraccion/features15k"
 descriptors, mapping = funcs.load_features(output_dir)
 
 print("Descriptores cargados:")
@@ -63,14 +64,17 @@ else:
     index = create_faiss_index_on_disk(descriptors, index_path)
 
 # Seleccionar imagen aleatoria como consulta
-random = funcs.select_random_query(descriptors)
+#random = funcs.select_random_query(descriptors)
+random = 13570  # Cambiar al índice deseado
 query_vector = descriptors[random]
-print(f"Índice aleatorio seleccionado: {random}")
+print(f"Índice seleccionado: {random}")
 
-# Realizar búsqueda KNN
+# Medir tiempo de ejecución
+start_time = time.time()  # Inicio del tiempo
 k = 8
 faiss_results = knn_faiss(query_vector, index, k=k)
+execution_time = time.time() - start_time  # Fin del tiempo
 
-# Mostrar resultados
+# Mostrar resultados y tiempo
+print(f"Tiempo de ejecución del KNN-HighD: {execution_time:.6f} segundos")
 funcs.show_results(faiss_results, output_dir, random, k)
-
