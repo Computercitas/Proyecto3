@@ -89,15 +89,18 @@ Se ejecutarán los siguientes algoritmos en una colección de objetos de diferen
 - KNN-secuencial
 - KNN-HighD
 
-TIEMPO DE BÚSQUEDA:
+*TIEMPO DE BÚSQUEDA:*
 El más rápido en cuanto a tiempo de búsqueda a lo largo es KNN con FAISS. Aunque KNN Rtree empieza siendo mejor, KNN con FAISSsaca ventaja a partir de 4000 datos.
 
 ![Para la Busqueda](imgs/busqueda_KNN.png)
+![Tabla](imgs/Tabla_tiempo_consulta.png)
 
-TIEMPO DE CONSTRUCCIÓN DE LOS INDICES:
+
+*TIEMPO DE CONSTRUCCIÓN DE LOS INDICES:*
 El más rápido en cuanto a tiempo de construcción de índice es KNN con FAISS
 
 ![Para la Construccion del indice](imgs/construccion_KNN.png)
+![Tabla](imgs/Tabla_tiempo_construccion.png)
 
 ### Visualización de Resultados
 Se presentarán los resultados experimentales mediante:
