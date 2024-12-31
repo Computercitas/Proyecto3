@@ -54,20 +54,42 @@ Para nuestro análisis, se decidió reducir los descriptores a 44 componentes, l
 - **Búsqueda por Rango:** Recuperará objetos dentro de un radio específico de la consulta. Se experimentará con tres valores de radio diferentes analizando la distribución de las distancias.
 
 ### KNN-HighD
-El KNN-HighD es un enfoque diseñado para realizar búsquedas eficientes de los k vecinos más cercanos en espacios vectoriales de alta dimensionalidad. Este método utiliza la biblioteca FAISS (Facebook AI Similarity Search) para mitigar el impacto de la "maldición de la dimensionalidad", un fenómeno en el que el rendimiento de las búsquedas basadas en la distancia disminuye significativamente a medida que aumenta la dimensionalidad de los datos.
+El KNN-HighD (K-Nearest Neighbors en alta dimensionalidad) aborda los desafíos asociados con la búsqueda eficiente en espacios de alta dimensionalidad, como la "maldición de la dimensionalidad". Para mitigar estos problemas, se utilizó la biblioteca FAISS (Facebook AI Similarity Search), específicamente con la estructura de índice IVFFlat (Inverted File Flat). Este enfoque combina algoritmos de agrupamiento y optimización para reducir el costo computacional y mejorar la escalabilidad.
 
-Mitigación de la Maldición de la Dimensionalidad
-FAISS utiliza optimizaciones específicas para manejar colecciones en espacios de alta dimensionalidad:
+### Teoría: La Maldición de la Dimensionalidad
 
-- Particionamiento (IndexIVFFlat): Reduce los cálculos innecesarios al restringir la búsqueda a clústeres relevantes.
-- Optimización Hardware: Aprovecha arquitecturas modernas (CPU/GPU) para mejorar el rendimiento.
+La **maldición de la dimensionalidad** afecta a algoritmos como KNN al trabajar con espacios de alta dimensionalidad, debido a:
+- **Pérdida de discriminación:** Las distancias entre puntos tienden a ser similares, lo que reduce la utilidad de métricas como la distancia Euclidiana (L2).
+- **Crecimiento exponencial del espacio:** La cantidad de datos necesarios para representar un espacio aumenta exponencialmente con su dimensionalidad.
 
-Beneficios del KNN-HighD con FAISS
-- Velocidad: Reducción significativa en tiempos de búsqueda frente a métodos tradicionales.
-- Escalabilidad: Manejo eficiente de grandes volúmenes de datos sin comprometer la precisión.
-- Flexibilidad: El índice puede ser almacenado en disco, facilitando su reutilización y reduciendo el consumo de memoria.
+Esta situación dificulta encontrar los vecinos más cercanos de manera eficiente. Por ello, es necesario implementar métodos que reduzcan el costo computacional y la complejidad.
 
----
+### Mitigación con FAISS e IVFFlat
+
+FAISS (Facebook AI Similarity Search) utiliza el índice **IVFFlat (Inverted File Flat)** para mitigar estos problemas:
+1. **Indexación por Agrupamiento:**
+   - Divide los datos en varios clústeres mediante algoritmos como k-means.
+   - Cada vector se asigna al clúster más cercano para evitar búsquedas en todo el espacio.
+
+2. **Estrategia Multinivel:**
+   - Los datos se organizan en listas invertidas basadas en los centroides de los clústeres.
+   - Durante una consulta, solo se evalúan los vectores del clúster más cercano.
+
+3. **Optimización de Distancias (L2):**
+   - FAISS utiliza cálculos optimizados para arquitecturas modernas, acelerando las búsquedas.
+
+### Beneficios de IVFFlat
+
+1. **Velocidad:**  
+   Reduce el tiempo de búsqueda al limitar las comparaciones al subconjunto más relevante.
+
+2. **Escalabilidad:**  
+   Maneja grandes volúmenes de datos al particionarlos eficientemente.
+
+3. **Ahorro de Recursos:**  
+   Los índices entrenados se pueden guardar en disco y reutilizar, evitando costos repetitivos de construcción.
+
+### Implementación del KNN-HighD
 
 ## 3. Frontend
 
@@ -83,34 +105,84 @@ Los resultados de búsqueda se mostrarán de forma interactiva y estarán asocia
 
 ## 4. Experimentación
 
-### Comparación de Eficiencia
-Se ejecutarán los siguientes algoritmos en una colección de objetos de diferentes tamaños (N):
-- KNN-RTree
-- KNN-secuencial
-- KNN-HighD
+En esta sección se detallan los experimentos realizados para evaluar la eficiencia de los diferentes métodos implementados para el sistema de recuperación de información. 
+
+#### Configuración
+Se trabajó con un conjunto de datos multimedia de diferentes tamaños (N) y se evaluaron los siguientes algoritmos:
+- **KNN-RTree**: Implementación basada en árboles R para realizar búsquedas eficientes.
+- **KNN-Secuencial**: Búsqueda lineal que compara cada elemento del conjunto con la consulta.
+- **KNN-HighD (FAISS)**: Biblioteca optimizada para espacios de alta dimensionalidad.
+
+Todas las pruebas se realizaron utilizando **K = 8** vecinos más cercanos.
+
 
 ### Visualización de Resultados
-Se presentarán los resultados experimentales mediante:
-- Tablas
-- Gráficos comparativos
+Los resultados experimentales se tabularon y graficaron para facilitar el análisis.
 
-### Análisis y Discusión
-Se analizarán los resultados y se discutirán las ventajas y desventajas de cada algoritmo. Todas las pruebas se realizarán con **K = 8**.
+#### Tiempo de búsqueda
 
-*TIEMPO DE BÚSQUEDA:*
-
-El más rápido en cuanto a tiempo de búsqueda a lo largo es KNN con FAISS. Aunque KNN Rtree empieza siendo mejor, KNN con FAISS saca ventaja a partir de 4000 datos.
+En esta prueba se evaluó el tiempo necesario para encontrar los K vecinos más cercanos para diferentes tamaños de datos. Los resultados se presentan en la siguiente gráfica:
 
 <img src="imgs/busqueda_KNN.png" width="700"/>
-<img src="imgs/Tabla_tiempo_consulta.png" width="400"/>
+
+| Tamaño de Datos (N) | KNN Secuencial (ms) | KNN RTree (ms) | KNN HighD (ms) |
+|-----------------------|---------------------|----------------|----------------|
+| 1000                 | 5.35                | 1.020           | 7.0596           |
+| 2000                 | 10.33               | 4.020           | 4.7847           |
+| 4000                 | 27.92               | 9.560           | 3.9297          |
+| 8000                 | 43.26               | 11.990          | 8.1943          |
+| 16000                | 85.27               | 41.125         |  7.8857          |
+| 32000                | 173.13              | 65.330          | 8.7014         |
+| 64000                | 389.67              | 93.520          | 8.4053          |
 
 
-*TIEMPO DE CONSTRUCCIÓN DE LOS INDICES:*
+**Análisis:**
+- **KNN-Secuencial** presenta un crecimiento exponencial en tiempo a medida que aumenta el tamaño del conjunto de datos.
+- **KNN-RTree** inicia con mejor rendimiento, pero su eficiencia disminuye para colecciones grandes.
+- **KNN-HighD** (FAISS) mantiene un tiempo de búsqueda estable, superando a los demás métodos para tamaños superiores a 4000 datos.
 
-El más rápido en cuanto a tiempo de construcción de índice es KNN con FAISS
+
+
+#### Tiempo de construcción de los índices
+
+Esta prueba evaluó el tiempo necesario para construir los índices de los algoritmos que los requieren. Los resultados se muestran a continuación:
 
 <img src="imgs/construccion_KNN.png" width="700"/>
-<img src="imgs/Tabla_tiempo_construccion.png" width="400"/>
+
+| Tamaño de Datos (N) | KNN RTree (ms)      | KNN HighD (ms) |
+|-----------------------|--------------------|----------------|
+| 1000                 | 2011.31           | 13.0126          |
+| 2000                 | 5063.83           | 17.3626          |
+| 4000                 | 9496.43           | 31.0382          |
+| 8000                 | 22061.49          | 20.3894          |
+| 16000                | 44662.79          | 30.9122          |
+| 32000                | 92836.16          | 62.6820          |
+| 64000                | 191183.86         | 96.8397          |
 
 
----
+**Análisis:**
+- **KNN-RTree** requiere un tiempo considerablemente mayor para construir su índice, especialmente a medida que aumenta el tamaño del conjunto de datos.
+- **KNN-HighD** demuestra una construcción de índices extremadamente rápida en comparación con KNN-RTree.
+
+
+
+### Análisis y Discusión
+
+**Ventajas y Desventajas:**
+1. **KNN-Secuencial:**
+   - *Ventajas*: Implementación simple y sin necesidad de preprocesamiento.
+   - *Desventajas*: Ineficiente para conjuntos de datos grandes debido a su crecimiento exponencial en tiempo de búsqueda.
+
+2. **KNN-RTree:**
+   - *Ventajas*: Bueno para tamaños de datos pequeños o medianos.
+   - *Desventajas*: Tiempo de construcción de índices muy alto y decrecimiento de eficiencia en colecciones grandes.
+
+3. **KNN-HighD (FAISS):**
+   - *Ventajas*: Excelente rendimiento tanto en tiempo de búsqueda como en construcción de índices; escalable y eficiente.
+   - *Desventajas*: Dependencia de librerías externas y optimizaciones específicas para hardware.
+
+**Conclusión:**
+FAISS se destaca como la mejor solución para el sistema de recuperación de información debido a su equilibrio entre eficiencia y escalabilidad, mitigando los desafíos de la alta dimensionalidad.
+
+
+
