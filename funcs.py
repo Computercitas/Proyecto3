@@ -2,6 +2,10 @@ import json
 import numpy as np
 from skimage.io import imread
 import matplotlib.pyplot as plt
+import joblib
+import cv2
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 def load_features(output_dir):
     """
@@ -11,7 +15,6 @@ def load_features(output_dir):
     with open(f"{output_dir}/checkpoint.json", 'r') as f:
         mapping = json.load(f)
     return descriptors, mapping
-
 
 # Métrica de distancia: Euclidiana
 def euclidean_distance(P, Q): 
@@ -62,8 +65,8 @@ def show_results(results, output_dir, query_idx=None, num_results=5):
         
         plt.title(f"Consulta:\n{query_filename}", fontsize=10)
         plt.axis('on')
-        plt.xticks([])
-        plt.yticks([])
+        plt.xticks([])  # Desactivar los ticks en los ejes
+        plt.yticks([])  # Desactivar los ticks en los ejes
         
         # Mostrar resultados
         for i, (idx, distance) in enumerate(results[:num_results]):
@@ -92,18 +95,10 @@ def show_results(results, output_dir, query_idx=None, num_results=5):
     plt.tight_layout()
     plt.show()
 
-#Seleccionar imagen aleatoria de los descriptores
+# Seleccionar imagen aleatoria de los descriptores
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
 
-
-from skimage.io import imread
-from skimage.color import rgb2gray
-import numpy as np
-import joblib
-import cv2
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
 
 def preprocess_query(query_path):
     scaler_path = "./Extraccion/features15k/scaler_model.joblib"
@@ -112,12 +107,12 @@ def preprocess_query(query_path):
     try:
         img = imread(query_path)
         if len(img.shape) == 3:
-            img = rgb2gray(img)  # Convert to grayscale if image has 3 channels
+            img = rgb2gray(img)  # Convertir a escala de grises si la imagen tiene 3 canales
         
-        img = (img * 255).astype(np.uint8)  # Ensure image pixel range is [0, 255]
+        img = (img * 255).astype(np.uint8)  # Asegurar que el rango de píxeles esté entre [0, 255]
         
         sift = cv2.SIFT_create()
-        keypoints, descriptors = sift.detectAndCompute(img, None) #Extraer features con SIFT
+        keypoints, descriptors = sift.detectAndCompute(img, None) # Extraer características con SIFT
 
         if descriptors is None:
             return None
@@ -130,11 +125,11 @@ def preprocess_query(query_path):
         if descriptor.ndim == 1:
             descriptor = descriptor.reshape(1, -1)
 
-        descriptor_scaled = scaler.transform(descriptor) # Escalar vector
+        descriptor_scaled = scaler.transform(descriptor) # Escalar el vector
         descriptor_reduced = pca.transform(descriptor_scaled) # Aplicar PCA
         query_vector = descriptor_reduced.reshape(-1)
         return query_vector
 
     except Exception as e:
-        print(f"Error in preprocess_query: {e}")
+        print(f"Error en preprocess_query: {e}")
         return None
