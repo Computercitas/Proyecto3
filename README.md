@@ -74,6 +74,8 @@ Beneficios del KNN-HighD con FAISS
 ### Diseño de la GUI
 Se diseñará una interfaz gráfica de usuario (GUI) intuitiva para que los usuarios puedan ingresar consultas y visualizar los resultados de búsqueda.
 
+- [Repositorio para correr el Frontend]([https://github.com/Dateadores/Proyecto2](https://github.com/Computercitas/Proyecto2y3-Frontend))
+
 ### Visualización de Resultados
 Los resultados de búsqueda se mostrarán de forma interactiva y estarán asociados a la búsqueda textual.
 
@@ -87,6 +89,15 @@ Se ejecutarán los siguientes algoritmos en una colección de objetos de diferen
 - KNN-secuencial
 - KNN-HighD
 
+TIEMPO DE BÚSQUEDA:
+El más rápido en cuanto a tiempo de búsqueda a lo largo es KNN con FAISS. Aunque KNN Rtree empieza siendo mejor, KNN con FAISSsaca ventaja a partir de 4000 datos.
+
+![Para la Busqueda](.imgs/busqueda_KNN.png)
+
+TIEMPO DE CONSTRUCCIÓN DE LOS INDICES:
+El más rápido en cuanto a tiempo de construcción de índice es KNN con FAISS
+
+![Para la Construccion del indice](.imgs/construccion_KNN.png)
 
 ### Visualización de Resultados
 Se presentarán los resultados experimentales mediante:
