@@ -94,6 +94,9 @@ Se presentarán los resultados experimentales mediante:
 - Tablas
 - Gráficos comparativos
 
+### Análisis y Discusión
+Se analizarán los resultados y se discutirán las ventajas y desventajas de cada algoritmo. Todas las pruebas se realizarán con **K = 8**.
+
 *TIEMPO DE BÚSQUEDA:*
 
 El más rápido en cuanto a tiempo de búsqueda a lo largo es KNN con FAISS. Aunque KNN Rtree empieza siendo mejor, KNN con FAISS saca ventaja a partir de 4000 datos.
@@ -109,7 +112,5 @@ El más rápido en cuanto a tiempo de construcción de índice es KNN con FAISS
 <img src="imgs/construccion_KNN.png" width="700"/>
 <img src="imgs/Tabla_tiempo_construccion.png" width="400"/>
 
-### Análisis y Discusión
-Se analizarán los resultados y se discutirán las ventajas y desventajas de cada algoritmo. Todas las pruebas se realizarán con **K = 8**.
 
 ---
