@@ -9,7 +9,7 @@ from time import perf_counter
 
 # Función para cargar descriptores y mapeo desde archivos
 def load_features(output_dir):
-    descriptors = np.load(f"{output_dir}/descriptores.npy")
+    descriptors = np.load(f"{output_dir}/descriptores_pca44.npy")
     with open(f"{output_dir}/checkpoint.json", 'r') as f:
         mapping = json.load(f)
     return descriptors, mapping
@@ -240,10 +240,12 @@ def show_results2(indices, output_dir, query_idx=None, num_results=5):
 def select_random_query(descriptors):
     return np.random.randint(len(descriptors))
 
-output_dir = "./Extraccion/features15k"
+output_dir = "C:/Users/Public/bd2/Proyecto2y3-Frontend/Proyecto3/Extraccion/features15k"
 descriptors, mapping = load_features(output_dir)
 # Selección de una consulta aleatoria del dataset
-random_idx = np.random.randint(0, len(descriptors))
+#random_idx = np.random.randint(0, len(descriptors))
+
+random_idx = 11638 #13570 #1826 #125
 print(f"Índice de consulta aleatoria: {random_idx}")
 query_vector = descriptors[random_idx]
 
