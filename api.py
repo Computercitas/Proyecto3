@@ -65,6 +65,7 @@ index_path = "C:/Users/Public/bd2/Proyecto2y3-Frontend/Proyecto3/KNN_HighD/faiss
 if os.path.exists(index_path):
     index = load_faiss_index_from_disk(index_path)
 else:
+    descriptors, _ = funcs.load_features("C:/Users/Public/bd2/Proyecto2y3-Frontend/Proyecto3/Extraccion/features15k")
     index = create_faiss_index_on_disk(descriptors, index_path)
 
 
@@ -128,6 +129,12 @@ def search_knn():
         # Obtener parámetros adicionales
         k = int(data.get('k', 8))  # Número de vecinos K
         knn_method = data.get('knn_method', 'KNN-HighD')  # Método KNN a usar
+
+
+        # Ejecutar el KNN seleccionado
+        results, query_time = execute_knn(query_vector, k, method=knn_method)
+        # Convertir los resultados a tipos básicos
+        results = [(float(idx), float(dist)) for idx, dist in results]
 
         # Ejecutar el KNN seleccionado
         results, query_time = execute_knn(query_vector, k, method=knn_method)
