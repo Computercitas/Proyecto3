@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
 from skimage.io import imread
-import json
+#import json
 import matplotlib.pyplot as plt
 from rtree import index
-import numpy as np
 
 #para importar funcs.py
 import sys
@@ -36,9 +35,14 @@ class Rtree:
         nearest_neighbors = list(self.idx.nearest(tuple(query_vector) + tuple(query_vector), k))
         return [(i, funcs.euclidean_distance(query_vector, self.descriptors[i])) for i in nearest_neighbors]
 
-
-output_dir = "./Extraccion/features15k"
+"""
+output_dir = "C:/Users/Public/bd2/Proyecto2y3-Frontend/Proyecto3/Extraccion/features15k"
 descriptors, mapping = funcs.load_features(output_dir)
+"""
+output_dir = os.path.join(base_dir, "Extraccion", "features15k")
+descriptors, mapping = funcs.load_features(output_dir)
+
+
 
 print("Descriptores cargados:")
 print(f"- Total descriptores: {descriptors.shape[0]}")
@@ -46,8 +50,8 @@ print(f"- Dimensiones descriptores: {descriptors.shape[1]}")
 print(f"- Mapeo de imágenes: {len(mapping)}")
 
 rtree = Rtree(descriptors, 44)
-
-random = funcs.select_random_query(descriptors) # Imagen aleatoria del dataset
+random = 11638 #13570 #1826 #125
+#random = funcs.select_random_query(descriptors) # Imagen aleatoria del dataset
 print("Query: ", random)
 query_vector = descriptors[random]
 
