@@ -184,5 +184,8 @@ Esta prueba evaluó el tiempo necesario para construir los índices de los algor
 **Conclusión:**
 FAISS se destaca como la mejor solución para el sistema de recuperación de información debido a su equilibrio entre eficiencia y escalabilidad, mitigando los desafíos de la alta dimensionalidad.
 
+### Video 
+
+[Video de Proyecto 3 en Drive](https://drive.google.com/drive/folders/1nNQXjQip6cyppLHK_kav3mBTBc67AnCn?usp=sharing)
 
 
