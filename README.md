@@ -16,8 +16,20 @@
 ### Objetivo del Proyecto
 El objetivo principal de este proyecto es construir un sistema de recuperación de información que permita realizar búsquedas eficientes de objetos multimedia (imágenes o audio) utilizando técnicas de indexación multidimensional.
 
-### Descripción del Dominio de Datos e Importancia de la Indexación
+### Dominio de Datos
 El proyecto se centra en el dominio de la búsqueda de objetos multimedia, como imágenes de productos de moda. La indexación es crucial en este dominio debido a la gran cantidad de datos multimedia disponibles. Un índice multidimensional permite realizar búsquedas rápidas y eficientes al organizar los datos en función de sus características extraídas.
+
+**Descripción del Dataset:**
+
+- **URL**: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset/data)
+- **Contenido**: El conjunto de datos incluye imágenes de productos de moda, con atributos asociados como categorías de productos, marcas, colores, precios y tipos de ropa.
+  
+**Atributos del Dataset**:
+  - **Imágenes**: Cada producto está representado por una o más imágenes, lo que permite realizar análisis visuales.
+  - **Categorías**: Las imágenes están etiquetadas con categorías específicas como ropa de hombre, mujer, accesorios, etc.
+  - **Atributos Adicionales**: Los productos también tienen información sobre su marca, precio y color, lo cual es útil para realizar tareas de clasificación, análisis de tendencias y recomendaciones.
+
+Este dataset se utiliza principalmente para entrenar modelos de aprendizaje automático en tareas como la clasificación de productos por categoría, el análisis de características visuales o la creación de sistemas de recomendación.
 
 ---
 
@@ -49,20 +61,103 @@ El objetivo de aplicar PCA es reducir el número de componentes de 128 a un núm
 
 Para nuestro análisis, se decidió reducir los descriptores a 44 componentes, lo cual permite retener el 99.0% de la varianza. Esta reducción es significativa ya que disminuye la dimensionalidad de los datos, facilitando su manejo y procesamiento, sin perder una cantidad considerable de información.
 
-### KNN Search y Range Search
-- **Búsqueda KNN (K-Nearest Neighbors):** Se implementarán algoritmos para encontrar los K objetos más similares a una consulta dada utilizando una cola de prioridad.
-- **Búsqueda por Rango:** Recuperará objetos dentro de un radio específico de la consulta. Se experimentará con tres valores de radio diferentes analizando la distribución de las distancias.
+### KNN Secuencial
 
+La búsqueda KNN secuencial es un enfoque simple para encontrar los `k` vecinos más cercanos a un vector de consulta. En lugar de utilizar estructuras de datos especializadas como R-trees o KD-trees, este enfoque recorre todos los descriptores de manera secuencial y calcula la distancia entre el vector de consulta y cada descriptor.
+
+#### Explicación del Código: Búsqueda KNN Secuencial
+
+##### Función `knn_sequential`:
+
+- **Entrada**:
+  - `query_vector`: El vector de consulta.
+  - `descriptors`: El conjunto de descriptores contra los cuales se realiza la búsqueda.
+  - `k`: El número de vecinos más cercanos a devolver (por defecto, 8).
+
+- **Proceso**:
+  1. **Cálculo de Distancia Euclidiana**: 
+     La función utiliza `np.linalg.norm(descriptors - query_vector, axis=1)` para calcular la distancia euclidiana entre el `query_vector` y cada descriptor en el conjunto de datos. Esto se hace a nivel de fila, comparando cada descriptor con el vector de consulta.
+  
+  2. **Ordenación de Distancias**:
+     Se ordenan las distancias calculadas y se seleccionan los primeros `k` descriptores más cercanos con `np.argsort(distances)[:k]`. Esto devuelve los índices de los descriptores más cercanos.
+
+  3. **Almacenamiento de Resultados**:
+     Los resultados se almacenan en una lista de tuplas `(índice, distancia)`, que se devuelve como resultado de la búsqueda.
+
+  4. **Cálculo del Tiempo de Ejecución**:
+     El tiempo total de la operación se calcula utilizando `perf_counter()`, y se imprime en milisegundos para medir el rendimiento del algoritmo.
+
+##### Cálculo de Distancias Euclidianas:
+
+La distancia euclidiana entre dos vectores \(A\) y \(B\) se calcula con la siguiente fórmula:
+
+$$
+\text{Distancia}(A, B) = \sqrt{\sum_{i=1}^{n}(A_i - B_i)^2}
+$$
+
+Donde:
+- \(n\) es el número de dimensiones del vector.
+- \(A_i\) y \(B_i\) son los componentes del vector en la dimensión \(i\).
+- La distancia euclidiana calcula la suma de las diferencias al cuadrado entre cada componente de los dos vectores, y luego toma la raíz cuadrada de esa suma.
+
+##### Optimización de Búsqueda:
+
+- **`np.argsort(distances)`**: Devuelve los índices que ordenarían el array de distancias en orden ascendente.
+- **`[:k]`**: Selecciona los primeros `k` índices, correspondientes a los `k` descriptores más cercanos.
+
+##### Ventajas y Limitaciones:
+
+- **Ventajas**:
+  - Es un enfoque simple y fácil de entender.
+  - No requiere estructuras de datos avanzadas como R-trees o KD-trees, lo que lo hace adecuado para datasets pequeños a medianos.
+
+- **Limitaciones**:
+  - La búsqueda es costosa en términos de tiempo computacional cuando el número de descriptores es grande. La complejidad temporal es \(O(n)\), donde \(n\) es el número de descriptores.
+  - No es escalable para grandes volúmenes de datos, ya que requiere calcular la distancia a todos los puntos en el espacio, lo cual es ineficiente para conjuntos de datos masivos.
+
+##### Resultados:
+
+- La función devuelve los `k` vecinos más cercanos junto con sus respectivas distancias.
+- El tiempo total de la búsqueda también se imprime en milisegundos, lo que permite evaluar el rendimiento del algoritmo en función del tamaño del conjunto de datos y la eficiencia de la búsqueda.
+
+### KNN Rtree
+El algoritmo KNN-RTree se utiliza para realizar búsquedas de los k vecinos más cercanos de manera eficiente. El R-tree es una estructura de índice multidimensional, especialmente adecuada para manejar datos espaciales y multidimensionales, como los descriptores de imágenes. A continuación, se explica cómo se implementa:
+
+1. **Creación del Índice R-tree:**
+   El índice R-tree se crea utilizando la librería `rtree` que nos permite insertar los descriptores y organizar la información en un formato jerárquico. Cada descriptor se mapea a un nodo en el R-tree, y se asignan límites superiores e inferiores en el espacio de características.
+
+2. **Búsqueda KNN:**
+   Cuando se realiza una consulta para encontrar los k vecinos más cercanos, el R-tree organiza y reduce el espacio de búsqueda, permitiendo encontrar rápidamente los puntos más cercanos a la consulta.
+
+#### Explicación del Código:
+
+##### Creación del R-Tree:
+- La clase `Rtree` recibe los descriptores (vectores de características) y la dimensión de los vectores. La propiedad `idx` contiene el índice R-tree que permite realizar búsquedas eficientes.
+- En el método `create_rtree_index()`, cada descriptor se inserta en el índice R-tree utilizando sus valores como límites superiores e inferiores.
+
+##### Búsqueda de K Vecinos más Cercanos:
+- El método `knn_rtree()` realiza la búsqueda de los k vecinos más cercanos para un vector de consulta específico. La consulta se realiza utilizando la función `nearest()` del índice R-tree, lo que optimiza el tiempo de búsqueda.
+- El resultado es una lista de los vecinos más cercanos junto con sus distancias a la consulta.
+
+##### Beneficios de KNN-RTree:
+- **Eficiencia:** La estructura R-tree reduce significativamente la cantidad de comparaciones necesarias al organizar los datos en una jerarquía espacial.
+- **Escalabilidad:** A medida que el conjunto de datos crece, el índice R-tree permite realizar búsquedas de manera eficiente sin necesidad de explorar todos los puntos en el espacio.
+
+  
 ### KNN-HighD
-El KNN-HighD (K-Nearest Neighbors en alta dimensionalidad) aborda los desafíos asociados con la búsqueda eficiente en espacios de alta dimensionalidad, como la "maldición de la dimensionalidad". Para mitigar estos problemas, se utilizó la biblioteca FAISS (Facebook AI Similarity Search), específicamente con la estructura de índice IVFFlat (Inverted File Flat). Este enfoque combina algoritmos de agrupamiento y optimización para reducir el costo computacional y mejorar la escalabilidad.
+El enfoque KNN-HighD (K-Nearest Neighbors en alta dimensionalidad) permite realizar búsquedas eficientes de los k vecinos más cercanos en espacios vectoriales de alta dimensionalidad, como los generados por descriptores SIFT. Sin embargo, trabajar con datos de alta dimensionalidad presenta desafíos significativos debido a la maldición de la dimensionalidad.
 
-### Teoría: La Maldición de la Dimensionalidad
+### La Maldición de la Dimensionalidad
 
-La **maldición de la dimensionalidad** afecta a algoritmos como KNN al trabajar con espacios de alta dimensionalidad, debido a:
+En espacios de alta dimensionalidad, muchos algoritmos, como KNN, enfrentan problemas como:
 - **Pérdida de discriminación:** Las distancias entre puntos tienden a ser similares, lo que reduce la utilidad de métricas como la distancia Euclidiana (L2).
 - **Crecimiento exponencial del espacio:** La cantidad de datos necesarios para representar un espacio aumenta exponencialmente con su dimensionalidad.
+- **Costos Computacionales:** Los cálculos en alta dimensionalidad son intensivos en tiempo y memoria.
 
-Esta situación dificulta encontrar los vecinos más cercanos de manera eficiente. Por ello, es necesario implementar métodos que reduzcan el costo computacional y la complejidad.
+Para mitigar estos problemas, en nuestro proyecto utilizamos las siguientes técnicas:
+- **Reducción de Dimensionalidad con PCA:** Los descriptores SIFT, originalmente de 128 dimensiones, fueron reducidos a 44 componentes principales, reteniendo el 99% de la varianza. Esto permitió disminuir el tamaño del espacio de búsqueda sin perder información crítica.
+- **Indexación Multidimensional con IVFFlat:** Se empleó la estructura IVFFlat de FAISS para optimizar las búsquedas KNN al dividir el espacio en clústeres más pequeños y manejables.
+
 
 ### Mitigación con FAISS e IVFFlat
 
@@ -89,7 +184,36 @@ FAISS (Facebook AI Similarity Search) utiliza el índice **IVFFlat (Inverted Fil
 3. **Ahorro de Recursos:**  
    Los índices entrenados se pueden guardar en disco y reutilizar, evitando costos repetitivos de construcción.
 
-### Implementación del KNN-HighD
+### Implementación en el código:
+
+- **Construcción del Índice IVFFlat:**
+El índice **FAISS IVFFlat** se creó a partir de los descriptores reducidos. En el archivo `knn-highd.py`, esto se implementa con:
+
+```python
+d = descriptors.shape[1]  # Dimensión de los descriptores
+quantizer = faiss.IndexFlatL2(d)  # Estructura base con distancia Euclidiana (L2)
+index = faiss.IndexIVFFlat(quantizer, d, 10)  # Índice IVFFlat con 10 centroides
+index.train(descriptors)  # Entrenamiento del índice con los datos
+index.add_with_ids(descriptors, np.arange(descriptors.shape[0]))  # Agregar datos al índice
+```
+
+El índice se guardó en disco para su reutilización futura con la función `faiss.write_index`.
+
+- **Búsqueda KNN**:
+
+Para realizar búsquedas KNN, se utilizó la función `index.search`, que identifica los k vecinos más cercanos a un vector de consulta:
+
+```python
+query_vector = descriptors[random].reshape(1, -1)  # Vector de consulta
+distances, indices = index.search(query_vector, k=8)  # Buscar 8 vecinos más cercanos
+```
+
+Esto devuelve las distancias y los índices de los vectores más cercanos al vector de consulta. Los resultados se visualizan utilizando una función auxiliar:
+
+```python
+funcs.show_results(faiss_results, output_dir, random, k)
+```
+
 
 ## 3. Frontend
 
@@ -98,10 +222,6 @@ Se diseñará una interfaz gráfica de usuario (GUI) intuitiva para que los usua
 
 - [Repositorio para correr el Frontend]([https://github.com/Dateadores/Proyecto2](https://github.com/Computercitas/Proyecto2y3-Frontend))
 
-### Visualización de Resultados
-Los resultados de búsqueda se mostrarán de forma interactiva y estarán asociados a la búsqueda textual.
-
----
 
 ## 4. Experimentación
 
