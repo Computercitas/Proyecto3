@@ -260,12 +260,12 @@ Este diseño asegura que el frontend sea flexible, fácil de usar, y se integre 
 ## Imágenes del frontend
 
 ### Página Principal
-![Página Principal](ruta/a/tu/imagen_pagina_principal.png)
+![Página Principal](imgs/homep3.jpeg)
 
 ### Búsqueda
-![Búsqueda](ruta/a/tu/imagen_resultados.png)
+![Búsqueda](imgs/busquedafront.PNG)
 
-![Resultados de la búsqueda](ruta/a/tu/imagen_resultados.png)
+![Resultados de la búsqueda](imgs/resultp3.PNG)
 
 ## 4. Experimentación
 
