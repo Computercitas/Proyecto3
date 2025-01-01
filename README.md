@@ -217,11 +217,55 @@ funcs.show_results(faiss_results, output_dir, random, k)
 
 ## 3. Frontend
 
-### Diseño de la GUI
-Se diseñará una interfaz gráfica de usuario (GUI) intuitiva para que los usuarios puedan ingresar consultas y visualizar los resultados de búsqueda.
+El frontend de este proyecto fue desarrollado utilizando **React** en combinación con **Vite**, lo que permite un desarrollo ágil y eficiente gracias a las características de rendimiento y simplicidad que Vite ofrece como herramienta de construcción.
 
-- [Repositorio para correr el Frontend]([https://github.com/Dateadores/Proyecto2](https://github.com/Computercitas/Proyecto2y3-Frontend))
+### Estructura e Implementación
 
+El código fuente del frontend se encuentra en el siguiente repositorio:
+[Proyecto2y3-Frontend](https://github.com/Computercitas/Proyecto2y3-Frontend/tree/main/Proyecto3/frontend3)
+
+Dentro de este repositorio, la funcionalidad principal está implementada en el componente **Consulta** (`Consulta.tsx`), donde se incluye una interfaz para realizar búsquedas KNN basadas en imágenes. A continuación, se detalla cómo funciona esta sección:
+
+#### Formulario de Búsqueda
+- El usuario puede ingresar el índice de un descriptor de imagen para realizar la búsqueda.
+- Se pueden seleccionar diferentes métodos de búsqueda KNN (`KNN-Secuencial`, `KNN-RTree` y `KNN-HighD`) mediante botones interactivos.
+- Permite especificar el número de resultados `Top-K`.
+
+#### Ejecución de la Consulta
+- Al hacer clic en el botón "Buscar", se envía una solicitud a la API backend (almacenada en `api.py`) utilizando el método POST.
+- La API devuelve los resultados más cercanos según el descriptor ingresado y el método KNN seleccionado.
+
+#### Visualización de Resultados
+- Los resultados incluyen información sobre los archivos encontrados, distancias, y enlaces a las imágenes correspondientes.
+- Si hay resultados, se muestran en una cuadrícula interactiva; en caso contrario, se informa al usuario que no se encontraron coincidencias.
+
+
+### Detalles Técnicos
+
+#### Librerías Utilizadas
+- **React**: Para la construcción de componentes.
+- **Vite**: Para la construcción y optimización del proyecto.
+- **Fetch API**: Para realizar solicitudes al backend.
+
+#### Estilos
+Los estilos están definidos en el archivo `Consulta.css`, proporcionando una interfaz intuitiva y limpia.
+
+#### Características Clave
+- Renderizado dinámico de los resultados en función de la respuesta de la API.
+- Manejo de errores para garantizar que el usuario ingrese información válida antes de realizar una consulta.
+- Uso de `useState` para gestionar el estado del descriptor, método seleccionado, resultados y tiempo de consulta.
+
+Este diseño asegura que el frontend sea flexible, fácil de usar, y se integre sin problemas con el backend para proporcionar resultados en tiempo real.
+
+## Imágenes del frontend
+
+### Página Principal
+![Página Principal](ruta/a/tu/imagen_pagina_principal.png)
+
+### Búsqueda
+![Búsqueda](ruta/a/tu/imagen_resultados.png)
+
+![Resultados de la búsqueda](ruta/a/tu/imagen_resultados.png)
 
 ## 4. Experimentación
 
